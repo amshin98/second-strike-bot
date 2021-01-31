@@ -1,2 +1,2 @@
-# 2nd-strike-bot
+# second-strike-bot
 Discord bot for setting up games

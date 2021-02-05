@@ -22,8 +22,9 @@ FIVE = "5️⃣"
 MAP_REACTS = [ONE, TWO, THREE, FOUR, FIVE]
 MAP_POOL = ["Ascent", "Bind", "Haven", "Icebox", "Split"]
 
-MAP_SELECT_PROMPT = "Please select a map from the following:"
-
+BANNER_DECO = "================="
+BAN_PHASE_TEXT = "BAN PHASE"
+PICK_PHASE_TEXT = "PICK PHASE"
 
 load_dotenv()
 TOKEN = os.getenv("DISCORD_TOKEN")
@@ -59,7 +60,7 @@ async def get_reaction_num(captain_id):
 
 
 async def handle_map_choice_response(captain_id, channel):
-   send_string = "%s\n" % MAP_SELECT_PROMPT
+   send_string = ""
    for i in range(len(MAP_POOL)):
       send_string += "> %s %s\n" % (MAP_REACTS[i], MAP_POOL[i])
 
@@ -71,11 +72,20 @@ async def handle_map_choice_response(captain_id, channel):
 
 
 async def get_map_choice(captain_id, channel, is_ban):
-   await channel.send("<@!%s>'s team will choose the first map to **%s**. " %
-      (captain_id, "ban" if is_ban else "play") +
-      "Please choose from the following:")
+   await channel.send("<@!%s>'s team, choose a map to **%s**:" %
+      (captain_id, "ban" if is_ban else "play") )
 
    return await handle_map_choice_response(captain_id, channel)
+
+
+async def send_phase_banner(channel, is_ban):
+   await channel.send("**%s %s %s**" % 
+      (BANNER_DECO, BAN_PHASE_TEXT if is_ban else PICK_PHASE_TEXT, BANNER_DECO))
+
+
+async def send_map_choices(channel, maps, is_ban):
+   await channel.send("%s maps: **%s** and **%s**" %
+      ("Banned" if is_ban else "Picked", maps[0], maps[1]))
 
 
 async def handle_match_setup(message):
@@ -86,7 +96,6 @@ async def handle_match_setup(message):
       % THUMBSUP)
    await msg.add_reaction(THUMBSUP)
 
-
    captains = []
    await get_reaction_user(captains, THUMBSUP)
    await get_reaction_user(captains, THUMBSUP)
@@ -94,8 +103,16 @@ async def handle_match_setup(message):
    team_a = randint(0, 1)
    team_b = 0 if team_a == 1 else 1
 
+   # Ban phase
+   await send_phase_banner(cur_channel, True)
    map_ban_1 = await get_map_choice(captains[team_a], cur_channel, True)
    map_ban_2 = await get_map_choice(captains[team_b], cur_channel, True)
+   await send_map_choices(cur_channel,
+      [MAP_POOL[map_ban_1], MAP_POOL[map_ban_2]], True)
+
+   # Pick and side phase
+   await send_phase_banner(cur_channel, False)
+
 
 
 def main():

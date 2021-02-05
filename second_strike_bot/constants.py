@@ -11,8 +11,14 @@ THREE = "3️⃣"
 FOUR = "4️⃣"
 FIVE = "5️⃣"
 
-MAP_REACTS = [ONE, TWO, THREE, FOUR, FIVE]
+MAP_BAN_REACTS = [ONE, TWO, THREE, FOUR, FIVE]
+MAP_PICK_REACTS = [ONE, TWO, THREE]
 MAP_POOL = ["Ascent", "Bind", "Haven", "Icebox", "Split"]
+
+DAGGER = "🗡️"
+SHIELD = "🛡️"
+SIDE_REACTS = [DAGGER, SHIELD]
+SIDES = ["Attack", "Defense"]
 
 BANNER_DECO = "================="
 BAN_PHASE_TEXT = "BAN PHASE"

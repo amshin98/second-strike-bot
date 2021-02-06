@@ -27,36 +27,47 @@ async def get_reaction_user(reacted_ids, emoji):
       return user.id
 
 
-async def get_reaction_num(react_options, captain_id):
+async def get_reaction_num(react_options, captain_id,
+   unavailable_maps_idx = []):
+
    try:
       reaction, user = await client.wait_for('reaction_add', timeout=60.0,
          check=lambda reaction, user:
          user.id == captain_id and
-         reaction.emoji in react_options)
+         reaction.emoji in react_options and
+         react_options.index(reaction.emoji) not in unavailable_maps_idx)
    except TimeoutError:
       await channel.send('Timeout')
    else:
       return react_options.index(reaction.emoji)
 
 
-async def handle_map_choice_response(map_pool, map_reacts, captain_id, channel):
+async def handle_map_choice_response(map_pool, map_reacts, unavailable_maps_idx,
+   captain_id, channel):
+
    send_string = ""
    for i in range(len(map_pool)):
-      send_string += "> %s %s\n" % (map_reacts[i], map_pool[i])
+      cur_string = "%s %s" % (map_reacts[i], map_pool[i])
+      if i in unavailable_maps_idx:
+         cur_string = "~~%s~~" % cur_string
+      cur_string = "> %s\n" % cur_string
+      send_string += cur_string
 
    msg = await channel.send(send_string)
    for react in map_reacts:
       await msg.add_reaction(react)
 
-   return await get_reaction_num(map_reacts, captain_id)
+   return await get_reaction_num(map_reacts, captain_id, unavailable_maps_idx)
 
 
-async def get_map_choice(map_pool, map_reacts, captain_id, channel, is_ban):
+async def get_map_choice(map_pool, map_reacts, unavailable_maps_idx,
+   captain_id, channel, is_ban):
+   
    await channel.send("<@!%s>, choose a map to **%s**:" %
       (captain_id, "ban" if is_ban else "play") )
 
    return await handle_map_choice_response(map_pool, map_reacts,
-      captain_id, channel)
+      unavailable_maps_idx, captain_id, channel)
 
 
 async def handle_side_choice_response(captain_id, channel):
@@ -135,9 +146,9 @@ async def handle_match_setup(message):
 
    # Ban phase
    await send_phase_banner(cur_channel, True)
-   map_ban_1 = await get_map_choice(MAP_POOL, MAP_BAN_REACTS,
+   map_ban_1 = await get_map_choice(MAP_POOL, MAP_BAN_REACTS, [],
       captains[team_1], cur_channel, True)
-   map_ban_2 = await get_map_choice(MAP_POOL, MAP_BAN_REACTS,
+   map_ban_2 = await get_map_choice(MAP_POOL, MAP_BAN_REACTS, [map_ban_1],
       captains[team_2], cur_channel, True)
    await send_map_choices(cur_channel,
       [MAP_POOL[map_ban_1], MAP_POOL[map_ban_2]], True)
@@ -150,11 +161,11 @@ async def handle_match_setup(message):
    # Pick and side phase
    await send_phase_banner(cur_channel, False)
    map_pick_1 = await get_map_choice(available_maps, MAP_PICK_REACTS,
-      captains[team_1], cur_channel, False)
+      [], captains[team_1], cur_channel, False)
    side_pick_2 = await get_side_choice(captains[team_2],
       available_maps[map_pick_1], cur_channel)
    map_pick_2 = await get_map_choice(available_maps, MAP_PICK_REACTS,
-      captains[team_2], cur_channel, False)
+      [map_pick_1], captains[team_2], cur_channel, False)
    side_pick_1 = await get_side_choice(captains[team_1],
       available_maps[map_pick_2], cur_channel)
 

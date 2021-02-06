@@ -2,7 +2,7 @@ import os
 from dotenv import load_dotenv
 
 
-CMD_PFX = "!"
+CMD_PFX = "/"
 THUMBSUP = "👍"
 
 ASCENT = "🗑️"
@@ -22,6 +22,8 @@ SIDES = ["Attack", "Defense"]
 BANNER_DECO = "================="
 BAN_PHASE_TEXT = "BAN PHASE"
 PICK_PHASE_TEXT = "PICK PHASE"
+
+HELP_TEXT = "%ssetup\tStarts setup for a best of 3 game" % CMD_PFX
 
 load_dotenv()
 TOKEN = os.getenv("DISCORD_TOKEN")

@@ -180,6 +180,10 @@ async def handle_match_setup(message):
       defender_ids)
    
 
+async def handle_help_message(message):
+   await message.channel.send(HELP_TEXT)
+
+
 def main():
    @client.event
    async def on_message(message):
@@ -188,6 +192,8 @@ def main():
 
          if command == "setup":
             await handle_match_setup(message)
+         elif command == "help":
+            await handle_help_message(message)
 
    client.run(TOKEN)
 

@@ -98,16 +98,22 @@ async def send_games(channel, captain_ids, maps, attacker_ids, defender_ids):
 
 
 # Remember, team 2 chooses side first
-def get_sides_lists(side_choices, captain_ids, attacker_ids, defender_ids):
+def get_sides_lists(side_choices, captain_ids, team_1, team_2,
+   attacker_ids, defender_ids):
+
    on_team_2 = True
    for side in side_choices:
       # Attack
       if side == 0:
-         attacker_ids.append(captain_ids[1] if on_team_2 else captain_ids[0])
-         defender_ids.append(captain_ids[0] if on_team_2 else captain_ids[1])
-      else:
-         defender_ids.append(captain_ids[1] if on_team_2 else captain_ids[0])
-         attacker_ids.append(captain_ids[0] if on_team_2 else captain_ids[1])
+         attacker_ids.append(captain_ids[team_2] if on_team_2
+            else captain_ids[team_1])
+         defender_ids.append(captain_ids[team_1] if on_team_2
+            else captain_ids[team_2])
+      else: # Defense
+         defender_ids.append(captain_ids[team_2] if on_team_2
+            else captain_ids[team_1])
+         attacker_ids.append(captain_ids[team_1] if on_team_2
+            else captain_ids[team_2])
 
       on_team_2 = not on_team_2
 
@@ -155,8 +161,8 @@ async def handle_match_setup(message):
    chosen_maps = [available_maps[map_pick_1], available_maps[map_pick_2]]
    attacker_ids = []
    defender_ids = []
-   get_sides_lists([side_pick_2, side_pick_1], captains, attacker_ids,
-      defender_ids)
+   get_sides_lists([side_pick_2, side_pick_1], captains, team_1, team_2,
+      attacker_ids, defender_ids)
    await send_games(cur_channel, captains, chosen_maps, attacker_ids,
       defender_ids)
    

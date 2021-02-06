@@ -146,25 +146,27 @@ async def handle_match_setup(message):
 
    # Ban phase
    await send_phase_banner(cur_channel, True)
-   map_ban_1 = await get_map_choice(MAP_POOL, MAP_BAN_REACTS, [],
+   map_ban_1 = await get_map_choice(MAP_POOL, MAP_REACTS, [],
       captains[team_1], cur_channel, True)
-   map_ban_2 = await get_map_choice(MAP_POOL, MAP_BAN_REACTS, [map_ban_1],
+   map_ban_2 = await get_map_choice(MAP_POOL, MAP_REACTS, [map_ban_1],
       captains[team_2], cur_channel, True)
    await send_map_choices(cur_channel,
       [MAP_POOL[map_ban_1], MAP_POOL[map_ban_2]], True)
 
    available_maps = []
+   available_map_reacts = []
    for i in range(len(MAP_POOL)):
       if i != map_ban_1 and i != map_ban_2:
          available_maps.append(MAP_POOL[i])
+         available_map_reacts.append(MAP_REACTS[i])
 
    # Pick and side phase
    await send_phase_banner(cur_channel, False)
-   map_pick_1 = await get_map_choice(available_maps, MAP_PICK_REACTS,
+   map_pick_1 = await get_map_choice(available_maps, available_map_reacts,
       [], captains[team_1], cur_channel, False)
    side_pick_2 = await get_side_choice(captains[team_2],
       available_maps[map_pick_1], cur_channel)
-   map_pick_2 = await get_map_choice(available_maps, MAP_PICK_REACTS,
+   map_pick_2 = await get_map_choice(available_maps, available_map_reacts,
       [map_pick_1], captains[team_2], cur_channel, False)
    side_pick_1 = await get_side_choice(captains[team_1],
       available_maps[map_pick_2], cur_channel)

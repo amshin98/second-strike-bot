@@ -5,14 +5,13 @@ from dotenv import load_dotenv
 CMD_PFX = "!"
 THUMBSUP = "👍"
 
-ONE = "1️⃣"
-TWO = "2️⃣"
-THREE = "3️⃣"
-FOUR = "4️⃣"
-FIVE = "5️⃣"
+ASCENT = "🗑️"
+BIND = "🍊"
+HAVEN = "🏯"
+ICEBOX = "☃️"
+SPLIT = "🌓"
 
-MAP_BAN_REACTS = [ONE, TWO, THREE, FOUR, FIVE]
-MAP_PICK_REACTS = [ONE, TWO, THREE]
+MAP_REACTS = [ASCENT, BIND, HAVEN, ICEBOX, SPLIT]
 MAP_POOL = ["Ascent", "Bind", "Haven", "Icebox", "Split"]
 
 DAGGER = "🗡️"

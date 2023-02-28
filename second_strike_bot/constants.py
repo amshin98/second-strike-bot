@@ -5,14 +5,18 @@ from dotenv import load_dotenv
 CMD_PFX = "/"
 THUMBSUP = "👍"
 
-ASCENT = "🗑️"
-BIND = "🍊"
+ASCENT = "🎲"
+BIND = "🏭"
+BREEZE = "🏝️"
+FRACTURE = "⚡"
 HAVEN = "🏯"
 ICEBOX = "☃️"
+LOTUS = "🌷"
+PEARL = "🦪"
 SPLIT = "🌓"
 
-MAP_REACTS = [ASCENT, BIND, HAVEN, ICEBOX, SPLIT]
-MAP_POOL = ["Ascent", "Bind", "Haven", "Icebox", "Split"]
+MAP_REACTS = [ASCENT, BIND, BREEZE, FRACTURE, HAVEN, ICEBOX, LOTUS, PEARL, SPLIT]
+MAP_POOL = ["Ascent", "Bind", "Breeze", "Fracture", "Haven", "Icebox", "Lotus", "Pearl", "Split"]
 
 DAGGER = "🗡️"
 SHIELD = "🛡️"

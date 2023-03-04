@@ -8,8 +8,6 @@ Discord bot for setting up games in a small Valorant league I have with my frien
 
 ## Limitations
 
-- Missing Breeze, Fracture, Lotus, and Pearl (#17)
-- Only one pick/ban session can be run at the same time (#12)
 - Only supports the pick/ban format described here:
 ![image](https://user-images.githubusercontent.com/23241280/219310485-55e1fcd6-da3b-4f7e-9d0e-1fbaa3c937a5.png)
 
@@ -50,6 +48,14 @@ This section is only necessary once to add the bot to your server.
 1. Create a file called `.env` in the root folder
 2. Add this line: `DISCORD_TOKEN=token_from_step_0.1_here`
 3. Add this line: `DISCORD_GUILD="Your Server Name Here"` (with the quotes)
+
+
+### Development
+Branch per feature with codeowner reviews.
+
+Linting: `black <path/to/second_strike_bot>`
+
+<a href="https://github.com/psf/black"><img alt="Code style: black" src="https://img.shields.io/badge/code%20style-black-000000.svg"></a>
 
 
 ## Using the Bot

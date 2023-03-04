@@ -16,7 +16,17 @@ PEARL = "🦪"
 SPLIT = "🌓"
 
 MAP_REACTS = [ASCENT, BIND, BREEZE, FRACTURE, HAVEN, ICEBOX, LOTUS, PEARL, SPLIT]
-MAP_POOL = ["Ascent", "Bind", "Breeze", "Fracture", "Haven", "Icebox", "Lotus", "Pearl", "Split"]
+MAP_POOL = [
+    "Ascent",
+    "Bind",
+    "Breeze",
+    "Fracture",
+    "Haven",
+    "Icebox",
+    "Lotus",
+    "Pearl",
+    "Split",
+]
 
 DAGGER = "🗡️"
 SHIELD = "🛡️"

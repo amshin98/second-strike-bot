@@ -14,13 +14,19 @@ client = discord.Client()
 
 
 async def get_reaction_user(reacted_ids, emoji, cur_channel):
+   """ Validates a user reaction to a message before returning their user ID """
+
+   def check_user_reaction_valid(reaction, user):
+      is_reaction_in_cur_channel = reaction.message.channel == cur_channel
+      is_not_bot_reaction = user.id != client.user.id
+      has_user_not_already_reacted = user.id not in reacted_ids
+      is_correct_reaction_emoji = is_reaction_emoji(reaction, emoji)
+
+      return is_reaction_in_cur_channel and is_not_bot_reaction and has_user_not_already_reacted and is_correct_reaction_emoji
+
    try:
       reaction, user = await client.wait_for('reaction_add', timeout=60.0,
-         check=lambda reaction, user:
-         reaction.message.channel == cur_channel and
-         user.id != client.user.id and
-         user.id not in reacted_ids and
-         is_reaction_emoji(reaction, emoji))
+         check=check_user_reaction_valid)
    except TimeoutError:
       await channel.send('Timeout')
    else:
@@ -30,14 +36,20 @@ async def get_reaction_user(reacted_ids, emoji, cur_channel):
 
 async def get_reaction_num(react_options, captain_id,
    cur_channel, unavailable_maps_idx = []):
+   """ Validates a user reaction to a message before returning the index of the map they selected """
+
+   def check_reaction_num_valid(reaction, user):
+      is_reaction_in_cur_channel = reaction.message.channel == cur_channel
+      is_user_current_captain = user.id == captain_id
+      is_valid_reaction_emoji = reaction.emoji in react_options
+      is_choice_available = react_options.index(reaction.emoji) not in unavailable_maps_idx
+      
+      return is_reaction_in_cur_channel and is_user_current_captain and is_valid_reaction_emoji and is_choice_available
+
 
    try:
       reaction, user = await client.wait_for('reaction_add', timeout=60.0,
-         check=lambda reaction, user:
-         reaction.message.channel == cur_channel and
-         user.id == captain_id and
-         reaction.emoji in react_options and
-         react_options.index(reaction.emoji) not in unavailable_maps_idx)
+         check= check_reaction_num_valid)
    except TimeoutError:
       await channel.send('Timeout')
    else:
@@ -46,6 +58,7 @@ async def get_reaction_num(react_options, captain_id,
 
 async def handle_map_choice_response(map_pool, map_reacts, unavailable_maps_idx,
    captain_id, channel):
+   """ Prints the maps and waits for the user to pick one """
 
    send_string = ""
    for i in range(len(map_pool)):
@@ -64,6 +77,7 @@ async def handle_map_choice_response(map_pool, map_reacts, unavailable_maps_idx,
 
 async def get_map_choice(map_pool, map_reacts, unavailable_maps_idx,
    captain_id, channel, is_ban):
+   """ Sends a map choice prompt then handles a map emoji choice response """
    
    await channel.send("<@!%s>, choose a map to **%s**:" %
       (captain_id, "ban" if is_ban else "play") )
@@ -72,8 +86,8 @@ async def get_map_choice(map_pool, map_reacts, unavailable_maps_idx,
       unavailable_maps_idx, captain_id, channel)
 
 
-# need to add channel check
 async def handle_side_choice_response(captain_id, channel):
+   """ Sends the actual side choices prompt then handles a side emoji choice response """
    send_string = ""
    for i in range(len(SIDES)):
       send_string += "> %s %s\n" % (SIDE_REACTS[i], SIDES[i])
@@ -86,6 +100,7 @@ async def handle_side_choice_response(captain_id, channel):
 
 
 async def get_side_choice(captain_id, match_map, channel):
+   """ Sends a prompt for a captain to select their side for a map and then handles the response """
    await channel.send("<@!%s>, choose your starting side for **%s**:" %
       (captain_id, match_map))
 
@@ -93,16 +108,19 @@ async def get_side_choice(captain_id, match_map, channel):
 
 
 async def send_phase_banner(channel, is_ban):
+   """ Handles sending the phase (ban, pick, etc.) notification banner """
    await channel.send("**%s %s %s**" % 
       (BANNER_DECO, BAN_PHASE_TEXT if is_ban else PICK_PHASE_TEXT, BANNER_DECO))
 
 
 async def send_map_choices(channel, maps, is_ban):
+   """ Sends an acknowledgement to a map choice (ban or pick) """
    await channel.send("%s maps: **%s** and **%s**" %
       ("Banned" if is_ban else "Chosen", maps[0], maps[1]))
 
 
 async def send_games(channel, captain_ids, maps, attacker_ids, defender_ids):
+   """ Sends a list of the games (map and which team is on which side) after picks and bans are done """
    send_string = ""
    for i in range(len(maps)):
       send_string += "Game %d: **%s** - %s <@!%s> vs. %s <@!%s>\n" % (i + 1,
@@ -111,9 +129,11 @@ async def send_games(channel, captain_ids, maps, attacker_ids, defender_ids):
    await channel.send(send_string)
 
 
-# Remember, team 2 chooses side first
 def get_sides_lists(side_choices, captain_ids, team_1, team_2,
    attacker_ids, defender_ids):
+   """ Handles adding the captain ids to the attacker_ids and defender_ids lists. Index 0 in each list
+   corresponds to the first game, index 1 the second game, etc. Used for displaying the final list of games.
+   Remember that Team 2 chooses the side first """
 
    on_team_2 = True
    for side in side_choices:
@@ -133,6 +153,7 @@ def get_sides_lists(side_choices, captain_ids, team_1, team_2,
 
 
 async def handle_match_setup(message):
+   """ The main match setup function """
    cur_channel = message.channel
 
    # Get captains mentions and decide Team A
@@ -184,6 +205,7 @@ async def handle_match_setup(message):
    
 
 async def handle_help_message(message):
+   """ Sends the help message """
    await message.channel.send(HELP_TEXT)
 
 

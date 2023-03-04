@@ -13,10 +13,11 @@ seed(None)
 client = discord.Client()
 
 
-async def get_reaction_user(reacted_ids, emoji):
+async def get_reaction_user(reacted_ids, emoji, cur_channel):
    try:
-      _, user = await client.wait_for('reaction_add', timeout=60.0,
+      reaction, user = await client.wait_for('reaction_add', timeout=60.0,
          check=lambda reaction, user:
+         reaction.message.channel == cur_channel and
          user.id != client.user.id and
          user.id not in reacted_ids and
          is_reaction_emoji(reaction, emoji))
@@ -28,11 +29,12 @@ async def get_reaction_user(reacted_ids, emoji):
 
 
 async def get_reaction_num(react_options, captain_id,
-   unavailable_maps_idx = []):
+   cur_channel, unavailable_maps_idx = []):
 
    try:
       reaction, user = await client.wait_for('reaction_add', timeout=60.0,
          check=lambda reaction, user:
+         reaction.message.channel == cur_channel and
          user.id == captain_id and
          reaction.emoji in react_options and
          react_options.index(reaction.emoji) not in unavailable_maps_idx)
@@ -57,7 +59,7 @@ async def handle_map_choice_response(map_pool, map_reacts, unavailable_maps_idx,
    for react in map_reacts:
       await msg.add_reaction(react)
 
-   return await get_reaction_num(map_reacts, captain_id, unavailable_maps_idx)
+   return await get_reaction_num(map_reacts, captain_id, channel, unavailable_maps_idx)
 
 
 async def get_map_choice(map_pool, map_reacts, unavailable_maps_idx,
@@ -70,6 +72,7 @@ async def get_map_choice(map_pool, map_reacts, unavailable_maps_idx,
       unavailable_maps_idx, captain_id, channel)
 
 
+# need to add channel check
 async def handle_side_choice_response(captain_id, channel):
    send_string = ""
    for i in range(len(SIDES)):
@@ -79,7 +82,7 @@ async def handle_side_choice_response(captain_id, channel):
    for react in SIDE_REACTS:
       await msg.add_reaction(react)
 
-   return await get_reaction_num(SIDE_REACTS, captain_id)
+   return await get_reaction_num(SIDE_REACTS, captain_id, channel)
 
 
 async def get_side_choice(captain_id, match_map, channel):
@@ -138,8 +141,8 @@ async def handle_match_setup(message):
    await msg.add_reaction(THUMBSUP)
 
    captains = []
-   await get_reaction_user(captains, THUMBSUP)
-   await get_reaction_user(captains, THUMBSUP)
+   await get_reaction_user(captains, THUMBSUP, cur_channel)
+   await get_reaction_user(captains, THUMBSUP, cur_channel)
 
    team_1 = randint(0, 1)
    team_2 = 0 if team_1 == 1 else 1

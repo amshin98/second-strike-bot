@@ -1,5 +1,5 @@
-import os
 import discord
+import channel_lock
 
 from constants import *
 from utils import *
@@ -34,7 +34,8 @@ async def get_reaction_user(reacted_ids, emoji, cur_channel):
             "reaction_add", timeout=60.0, check=check_user_reaction_valid
         )
     except TimeoutError:
-        await channel.send("Timeout")
+        await cur_channel.send("Timeout")
+        raise TimeoutError
     else:
         reacted_ids.append(user.id)
         return user.id
@@ -65,7 +66,8 @@ async def get_reaction_num(
             "reaction_add", timeout=60.0, check=check_reaction_num_valid
         )
     except TimeoutError:
-        await channel.send("Timeout")
+        await cur_channel.send("Timeout")
+        raise TimeoutError
     else:
         return react_options.index(reaction.emoji)
 
@@ -262,8 +264,20 @@ def main():
         if len(message.content) > 1 and message.content.startswith(CMD_PFX):
             command = message.content[1:]
 
-            if command == "setup":
-                await handle_match_setup(message)
+            if command == "setup" and not channel_lock.is_channel_in_use(
+                message.channel
+            ):
+                # Mark the channel as free if any exception occurs during match setup
+                try:
+                    cur_channel = message.channel
+
+                    channel_lock.mark_channel_in_use(cur_channel)
+                    await handle_match_setup(message)
+                    channel_lock.mark_channel_free(cur_channel)
+                except Exception as exception:
+                    channel_lock.mark_channel_free(cur_channel)
+                    raise exception
+
             elif command == "help":
                 await handle_help_message(message)
 
